@@ -1,2 +1,3 @@
-/.env
-/hosting_guide.md
+.env
+hosting_guide.md
+.gitignore

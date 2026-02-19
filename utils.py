@@ -35,6 +35,19 @@ def get_public_url(key):
         return f"https://{CLOUDFRONT_DOMAIN}/{clean_key}"
     return f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{clean_key}"
 
+def get_category_folder(image_type):
+    """Map image types to folder categories based on the standard structure"""
+    folder_map = {
+        "model_ref": "model-refs",
+        "outfit": "outfit-refs",
+        "jewelry": "jewelry-refs",
+        "environment": "environment-refs",
+        "pose": "pose-refs",
+        "hair": "hair-refs",
+        "quick_update": "quick-update-refs"
+    }
+    return folder_map.get(image_type, "other-refs")
+
 def upload_to_s3(key, data, content_type):
     """Upload file to S3 and return public URL"""
     try:

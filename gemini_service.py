@@ -92,3 +92,36 @@ def generate_and_upload_image(payload):
         raise Exception(f"S3 upload failed: {upload_result.get('error')}")
         
     return upload_result['public_url']
+
+def generate_quick_update(prompt, image_urls=None, aspect_ratio="2:3", resolution="4K"):
+    """
+    Simplified Quick Update generation: Prompt + optional reference images.
+    """
+    print(f"[generate_quick_update] Generating with prompt: {prompt[:50]}...")
+    
+    parts = [{"text": prompt}]
+    
+    if image_urls:
+        for i, url in enumerate(image_urls[:14]): # Limit to 14 images as per Gemini best practices
+            base64_data = fetch_image_as_base64(url)
+            # Add explicit label so Gemini can reference it (e.g. "ATTACHED IMAGE 1")
+            parts.append({"text": f"ATTACHED IMAGE {i+1}:"})
+            parts.append({
+                "inlineData": {
+                    "mime_type": "image/jpeg",
+                    "data": base64_data
+                }
+            })
+
+    payload = {
+        "contents": [{"role": "user", "parts": parts}],
+        "generationConfig": {
+            "responseModalities": ["IMAGE"],
+            "imageConfig": {
+                "aspectRatio": aspect_ratio,
+                "imageSize": resolution
+            }
+        }
+    }
+
+    return generate_and_upload_image(payload)

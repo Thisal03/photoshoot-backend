@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from utils import get_batch_variation
-from gemini_service import build_gemini_payload, generate_and_upload_image
+from gemini_service import build_gemini_payload, generate_and_upload_image, generate_quick_update
 
 load_dotenv()
 
@@ -75,6 +75,32 @@ def generate():
         
     except Exception as e:
         print(f"[Error] {str(e)}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/quick-update', methods=['POST'])
+def quick_update():
+    try:
+        data = request.json
+        prompt = data.get('prompt')
+        image_urls = data.get('image_urls', [])
+        aspect_ratio = data.get('aspect_ratio', '2:3')
+        resolution = data.get('resolution', '4K')
+
+        if not prompt:
+            return jsonify({"status": "error", "message": "Prompt is required"}), 400
+
+        print(f"[QuickUpdate] Received request. Images: {len(image_urls)}")
+        
+        image_url = generate_quick_update(prompt, image_urls, aspect_ratio, resolution)
+
+        return jsonify({
+            "status": "success",
+            "message": "Quick update image generated",
+            "data": {"image": image_url}
+        }), 200
+
+    except Exception as e:
+        print(f"[QuickUpdate Error] {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':

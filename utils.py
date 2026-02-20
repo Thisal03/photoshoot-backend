@@ -48,16 +48,28 @@ def get_category_folder(image_type):
     }
     return folder_map.get(image_type, "other-refs")
 
-def upload_to_s3(key, data, content_type):
-    """Upload file to S3 and return public URL"""
+def upload_to_s3(key, body, content_type):
+    """Upload file to S3 and return public URL. Supports bytes or file-like objects."""
     try:
-        s3_client.put_object(
-            Bucket=S3_BUCKET_NAME,
-            Key=key,
-            Body=data,
-            ContentType=content_type,
-            CacheControl='max-age=3600'
-        )
+        # Check if body is a file-like object (has read method)
+        if hasattr(body, 'read'):
+            s3_client.upload_fileobj(
+                body,
+                S3_BUCKET_NAME,
+                key,
+                ExtraArgs={
+                    'ContentType': content_type,
+                    'CacheControl': 'max-age=3600'
+                }
+            )
+        else:
+            s3_client.put_object(
+                Bucket=S3_BUCKET_NAME,
+                Key=key,
+                Body=body,
+                ContentType=content_type,
+                CacheControl='max-age=3600'
+            )
         return {
             'success': True,
             'public_url': get_public_url(key)

@@ -1,10 +1,6 @@
 import os
 import json
-import sys
 from flask import Flask, request, jsonify
-
-# Increase recursion depth for ijson/gevent/gthread streaming
-sys.setrecursionlimit(3000)
 from flask_cors import CORS
 from dotenv import load_dotenv
 from utils import get_batch_variation

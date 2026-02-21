@@ -3,6 +3,4 @@ flask-cors
 boto3
 requests
 python-dotenv
-ijson
 gunicorn
-gevent

@@ -9,7 +9,9 @@ services:
     env_file:
       - .env
     environment:
-      - FLASK_DEBUG=1
+      - FLASK_DEBUG=0
     restart: always
-    volumes:
-      - .:/app
+    # We remove the volumes section for production to use the code inside the image
+    # volumes:
+    #   - .:/app
+    command: gunicorn --worker-class sync --workers 2 --timeout 300 -b 0.0.0.0:5000 app:app

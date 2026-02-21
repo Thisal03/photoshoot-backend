@@ -8,3 +8,4 @@ __pycache__/
 .idea/
 .gitignore
 hosting_guide.md
+ec2_deployment.md
